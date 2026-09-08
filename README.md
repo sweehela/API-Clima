@@ -14,6 +14,9 @@ API que consome a [OpenWeather API](https://openweathermap.org/api) e retorna da
 - 🌅 Horários de nascer e pôr do sol
 - 📝 Resumo em texto formatado
 - 🌙/☀️ Interface interativa com tema claro/escuro
+- 🔤 Busca flexível: aceita nomes sem acentos, sem hifens, maiúsculas/minúsculas
+- 🌐 Nomes de cidades em português (ex: "Tokyo" → "Tóquio", "London" → "Londres")
+- 💡 Sugestões de cidades similares quando o nome digitado não é encontrado (ex: "peltas" → Pelotas)
 
 ## 📁 Estrutura do projeto
 
@@ -22,6 +25,7 @@ api_clima/
 ├── app/
 │   ├── __init__.py        # Instância do FastAPI e registro de rotas
 │   ├── config.py          # Configurações e variáveis de ambiente
+│   ├── utils.py           # Normalização de texto, mapeamento PT e sugestões
 │   └── rotas/
 │       ├── __init__.py
 │       ├── inicio.py      # Rota "/" e "/redoc"
@@ -91,6 +95,16 @@ Consulta os dados climáticos em tempo real de uma cidade.
 | --------- | ------ | ----------- | -------------------------------------- |
 | `cidade`  | string | Sim         | Nome da cidade (ex: São Paulo, London) |
 
+#### Busca flexível
+
+A busca normaliza o nome da cidade antes de consultar a OpenWeather:
+
+- **Sem acentos:** "toquio" funciona igual a "tóquio"
+- **Sem hifens:** "nao me toque" funciona igual a "Não-Me-Toque"
+- **Maiúsculas/minúsculas:** indiferente
+- **Nome em português:** cidades com nomes diferentes em português são retornadas no idioma correto (ex: "Tokyo" → "Tóquio", "London" → "Londres", "Madrid" → "Madri")
+- **Sugestões:** quando a cidade não é encontrada, a API retorna sugestões de cidades com nome similar (ex: "peltas" → sugere "Pelotas")
+
 #### Resposta de sucesso (`200`)
 
 ```json
@@ -123,9 +137,18 @@ Consulta os dados climáticos em tempo real de uma cidade.
 
 | Status | Descrição                                       |
 | ------ | ----------------------------------------------- |
-| `400`  | Cidade não encontrada pela OpenWeather          |
+| `404`  | Cidade não encontrada (inclui sugestões no corpo) |
 | `500`  | Chave da API OpenWeather ausente no `.env`     |
 | `503`  | Erro de conexão com a OpenWeather               |
+
+##### Exemplo de erro 404 com sugestões
+
+```json
+{
+  "detail": "Cidade 'peltas' não encontrada.",
+  "sugestoes": ["Pelotas", "Palmas"]
+}
+```
 
 ### `GET /docs`
 

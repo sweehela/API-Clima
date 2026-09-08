@@ -66,6 +66,12 @@ header .subtitle { font-size:.85rem; color:var(--text-muted); margin-top:4px; fo
 .wc-sun-item .emoji { font-size:1.6rem; }
 .wc-sun-item .val { font-size:.95rem; color:var(--text); margin-top:4px; font-weight:600; }
 .wc-sun-item .lbl { font-size:.72rem; color:var(--text-muted); }
+
+.suggestions { max-width:600px; margin:20px auto; text-align:center; }
+.suggestions p { color:var(--text-muted); margin-bottom:12px; font-size:.95rem; }
+.suggestion-list { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
+.suggestion-btn { background:var(--bg-card); border:1px solid var(--border); color:var(--accent); padding:10px 20px; border-radius:10px; cursor:pointer; font-size:.95rem; font-weight:600; transition:all .2s; }
+.suggestion-btn:hover { background:var(--accent); color:var(--bg); border-color:var(--accent); transform:translateY(-2px); box-shadow:0 4px 12px var(--shadow); }
 """
 
 
@@ -122,7 +128,21 @@ def docs_page():
               .then(({{ok, d}}) => {{
                 document.getElementById('searchBtn').disabled = false;
                 if (!ok) {{
-                  area.innerHTML = '<div class="error-msg">❌ ' + (d.detail || 'Erro ao consultar cidade.') + '</div>';
+                  let html = '<div class="error-msg">❌ ' + (d.detail || 'Erro ao consultar cidade.') + '</div>';
+                  if (d.sugestoes && d.sugestoes.length > 0) {{
+                    html += '<div class="suggestions"><p>🔍 Você quis dizer:</p><div class="suggestion-list">';
+                    d.sugestoes.forEach(function(s) {{
+                      html += '<button class="suggestion-btn" data-cidade="' + s + '">' + s + '</button>';
+                    }});
+                    html += '</div></div>';
+                  }}
+                  area.innerHTML = html;
+                  area.querySelectorAll('.suggestion-btn').forEach(function(btn) {{
+                    btn.addEventListener('click', function() {{
+                      document.getElementById('cityInput').value = this.getAttribute('data-cidade');
+                      buscarClima();
+                    }});
+                  }});
                   return;
                 }}
                 renderClima(d);
