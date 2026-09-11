@@ -116,6 +116,53 @@ CIDADES_CONHECIDAS = [
 ]
 
 
+ESTADOS_BR_MAP = {
+    "acre": "AC",
+    "alagoas": "AL",
+    "amapa": "AP",
+    "amazonas": "AM",
+    "bahia": "BA",
+    "ceara": "CE",
+    "distrito federal": "DF",
+    "espirito santo": "ES",
+    "goias": "GO",
+    "maranhao": "MA",
+    "mato grosso": "MT",
+    "mato grosso do sul": "MS",
+    "minas gerais": "MG",
+    "para": "PA",
+    "paraiba": "PB",
+    "parana": "PR",
+    "pernambuco": "PE",
+    "piaui": "PI",
+    "rio de janeiro": "RJ",
+    "rio grande do norte": "RN",
+    "rio grande do sul": "RS",
+    "rondonia": "RO",
+    "roraima": "RR",
+    "santa catarina": "SC",
+    "sao paulo": "SP",
+    "sergipe": "SE",
+    "tocantins": "TO",
+}
+
+
+def sigla_estado(geo_result: dict) -> str:
+    """Retorna a sigla do estado a partir de um resultado da API de geocodificação.
+
+    Para o Brasil, o OpenWeather retorna o nome completo do estado
+    (ex: "Rio Grande do Sul"); convertemos para a sigla (ex: "RS").
+    Para outros países, o campo 'state' já costuma vir como sigla.
+    """
+    estado = (geo_result.get("state") or "").strip()
+    if not estado:
+        return ""
+    norm = normalizar(estado)
+    if norm in ESTADOS_BR_MAP:
+        return ESTADOS_BR_MAP[norm]
+    return estado
+
+
 def gerar_variacoes(nome: str) -> list:
     variacoes = [nome]
     sem_hifens = nome.replace("-", " ")

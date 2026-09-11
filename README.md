@@ -17,6 +17,9 @@ API que consome a [OpenWeather API](https://openweathermap.org/api) e retorna da
 - 🔤 Busca flexível: aceita nomes sem acentos, sem hifens, maiúsculas/minúsculas
 - 🌐 Nomes de cidades em português (ex: "Tokyo" → "Tóquio", "London" → "Londres")
 - 💡 Sugestões de cidades similares quando o nome digitado não é encontrado (ex: "peltas" → Pelotas)
+- 📍 Estado exibido ao lado do país (ex: "BR - RS"), buscado automaticamente
+- 🔁 Desambiguação de cidades de mesmo nome (ex: "Bom Jesus" → lista com RS, PI, SC, PB, RN)
+- 📌 Cidades fixadas: fixe/desfixe cidades pesquisadas com frequência numa aba dedicada (salvas no navegador)
 
 ## 📁 Estrutura do projeto
 
@@ -94,6 +97,7 @@ Consulta os dados climáticos em tempo real de uma cidade.
 | Parâmetro | Tipo   | Obrigatório | Descrição                              |
 | --------- | ------ | ----------- | -------------------------------------- |
 | `cidade`  | string | Sim         | Nome da cidade (ex: São Paulo, London) |
+| `estado`  | string | Não         | Sigla ou nome do estado para desambiguar cidades de mesmo nome (ex: `RS`, `Rio Grande do Sul`) |
 
 #### Busca flexível
 
@@ -104,17 +108,20 @@ A busca normaliza o nome da cidade antes de consultar a OpenWeather:
 - **Maiúsculas/minúsculas:** indiferente
 - **Nome em português:** cidades com nomes diferentes em português são retornadas no idioma correto (ex: "Tokyo" → "Tóquio", "London" → "Londres", "Madrid" → "Madri")
 - **Sugestões:** quando a cidade não é encontrada, a API retorna sugestões de cidades com nome similar (ex: "peltas" → sugere "Pelotas")
+- **Desambiguação:** quando existem várias cidades com o mesmo nome (ex: "Bom Jesus"), a API retorna uma lista de opções (com país, estado e coordenadas) para o usuário selecionar. Informe `estado` para obter o clima de uma específica (ex: `/clima?cidade=Bom Jesus&estado=RS`)
+- **Estado:** o estado é exibido automaticamente ao lado do país no resumo e nos dados (ex: "Pelotas, BR - RS"). No Brasil, nomes completos são convertidos para siglas (ex: "Rio Grande do Sul" → "RS")
 
 #### Resposta de sucesso (`200`)
 
 ```json
 {
-  "mensagem": "☀️ Dados climáticos para São Paulo",
-  "resumo": "☀️ Clima em São Paulo, BR:\n   • Condição: Céu limpo\n   • 🌡️ Temperatura: 28.5 °C (sensação térmica de 30.0 °C)\n   • 💧 Umidade: 60%\n   • 🌬️ Vento: 3.2 m/s\n   • ☁️ Nuvens: 0%",
+  "mensagem": "☀️ Dados climáticos para Pelotas",
+  "resumo": "☀️ Clima em Pelotas, BR - RS:\n   • Condição: Céu limpo\n   • 🌡️ Temperatura: 28.5 °C (sensação térmica de 30.0 °C)\n   • 💧 Umidade: 60%\n   • 🌬️ Vento: 3.2 m/s\n   • ☁️ Nuvens: 0%",
   "dados": {
-    "cidade": "São Paulo",
+    "cidade": "Pelotas",
     "pais": "BR",
-    "coordenadas": { "latitude": -23.55, "longitude": -46.63 },
+    "estado": "RS",
+    "coordenadas": { "latitude": -31.77, "longitude": -52.34 },
     "clima": { "icone": "☀️", "condicao": "Clear", "descricao": "Céu limpo" },
     "temperatura": {
       "atual_c": 28.5,
@@ -132,6 +139,24 @@ A busca normaliza o nome da cidade antes de consultar a OpenWeather:
   }
 }
 ```
+
+##### Exemplo de desambiguação (várias cidades de mesmo nome)
+
+`GET /clima?cidade=Bom Jesus` → `200`
+
+```json
+{
+  "acao": "selecionar",
+  "mensagem": "🔍 Foram encontradas 5 cidades chamadas 'Bom Jesus'. Selecione a desejada:",
+  "cidades": [
+    { "nome": "Bom Jesus", "pais": "BR", "estado": "RS", "estado_nome": "Rio Grande do Sul", "latitude": -28.67, "longitude": -50.43 },
+    { "nome": "Bom Jesus", "pais": "BR", "estado": "PI", "estado_nome": "Piauí", "latitude": -9.07, "longitude": -44.36 },
+    { "nome": "Bom Jesus", "pais": "BR", "estado": "SC", "estado_nome": "Santa Catarina", "latitude": -26.74, "longitude": -52.39 }
+  ]
+}
+```
+
+Para obter o clima de uma específica: `GET /clima?cidade=Bom Jesus&estado=PI`
 
 #### Códigos de erro
 
@@ -153,6 +178,11 @@ A busca normaliza o nome da cidade antes de consultar a OpenWeather:
 ### `GET /docs`
 
 Interface interativa para consultar o clima de qualquer cidade de forma visual e polida, com suporte a tema claro/escuro.
+
+A interface possui duas abas:
+
+- **🔍 Buscar:** pesquisa de cidades por nome. Após exibir o clima de uma cidade, um botão 📌/📍 aparece no canto superior direito para fixar/desfixar a cidade.
+- **📌 Fixadas:** mostra as cidades fixadas em cartões compactos com o clima atual. Cada cartão tem um botão ✕ para desfixar e pode ser clicado para abrir a cidade na aba Buscar. As cidades fixadas são salvas no `localStorage` do navegador.
 
 ### `GET /redoc`
 
