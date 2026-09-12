@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+import os
 
 tags_metadata = [
     {
@@ -42,3 +44,6 @@ from app.rotas import inicio, clima, docs  # noqa: E402
 app.include_router(inicio.router)
 app.include_router(clima.router)
 app.include_router(docs.router)
+
+_PNG_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "PNGs")
+app.mount("/pngs", StaticFiles(directory=_PNG_DIR), name="pngs")

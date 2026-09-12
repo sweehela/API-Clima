@@ -17,18 +17,28 @@ router = APIRouter()
 def _icone_clima(condicao: str) -> str:
     c = (condicao or "").lower()
     if any(x in c for x in ["clear", "limpo", "sol"]):
-        return "☀️"
+        return "clear"
     if any(x in c for x in ["cloud", "nuvem"]):
-        return "☁️"
+        return "cloud"
     if any(x in c for x in ["rain", "chuva"]):
-        return "🌧️"
+        return "rain"
     if any(x in c for x in ["thunder", "tempestade"]):
-        return "⛈️"
+        return "thunder"
     if any(x in c for x in ["snow", "neve"]):
-        return "❄️"
+        return "snow"
     if any(x in c for x in ["mist", "fog", "névoa", "neblina"]):
-        return "🌫️"
-    return "🌡️"
+        return "fog"
+    return "cloud"
+
+
+_ICONE_EMOJI = {
+    "clear": "☀️",
+    "cloud": "☁️",
+    "rain": "🌧️",
+    "thunder": "⛈️",
+    "snow": "❄️",
+    "fog": "🌫️",
+}
 
 
 def _geocodificar_todos(nome_cidade: str, limite: int = 5) -> tuple[list, bool]:
@@ -141,7 +151,7 @@ def _obter_nome_pt(geo_result: dict, norm: str) -> str:
                                     "pais": "BR",
                                     "estado": "RS",
                                     "coordenadas": {"latitude": -31.77, "longitude": -52.34},
-                                    "clima": {"icone": "☀️", "condicao": "Clear", "descricao": "Céu limpo"},
+                                    "clima": {"icone": "clear", "condicao": "Clear", "descricao": "Céu limpo"},
                                     "temperatura": {
                                         "atual_c": 28.5,
                                         "sensacao_termica_c": 30.0,
@@ -325,7 +335,7 @@ def obter_clima(
     local = f"{pais} - {sigla}" if sigla else pais
 
     resumo = (
-        f"{icone} Clima em {nome_pt}, {local}:\n"
+        f"{_ICONE_EMOJI.get(icone, '☁️')} Clima em {nome_pt}, {local}:\n"
         f"   • Condição: {descricao}\n"
         f"   • 🌡️ Temperatura: {dados.get('main', {}).get('temp')} °C "
         f"(sensação térmica de {dados.get('main', {}).get('feels_like')} °C)\n"

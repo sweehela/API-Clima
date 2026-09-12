@@ -20,13 +20,14 @@ _DOCS_CSS = """
 }
 body { font-family:'Segoe UI',system-ui,Arial,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; transition:background .3s,color .3s; }
 
-header { background:var(--grad); border-bottom:1px solid var(--border); padding:28px 24px; text-align:center; position:relative; }
-header h1 { font-size:2rem; color:var(--accent); letter-spacing:.5px; }
-header .subtitle { font-size:.85rem; color:var(--text-muted); margin-top:4px; font-style:italic; }
+header { background:var(--grad); border-bottom:1px solid var(--border); padding:14px 24px; text-align:center; position:relative; }
+header .logo-img { max-width:140px; width:100%; height:auto; display:block; margin:0 auto; }
+header .subtitle { font-size:.8rem; color:var(--text-muted); margin-top:6px; font-style:italic; }
 
-.header-btns { position:absolute; top:20px; right:24px; display:flex; gap:10px; }
-.header-btn { background:var(--bg-card); border:1px solid var(--border); color:var(--text); width:42px; height:42px; border-radius:50%; cursor:pointer; font-size:1.2rem; display:flex; align-items:center; justify-content:center; transition:all .25s; }
+.header-btns { position:absolute; top:50%; right:24px; transform:translateY(-50%); display:flex; gap:12px; }
+.header-btn { background:var(--bg-card); border:1px solid var(--border); color:var(--text); width:52px; height:52px; border-radius:50%; cursor:pointer; font-size:1.2rem; display:flex; align-items:center; justify-content:center; transition:all .25s; overflow:hidden; }
 .header-btn:hover { border-color:var(--accent); color:var(--accent); transform:scale(1.08); }
+.header-btn img { width:32px; height:32px; object-fit:contain; }
 .pin-btn { display:none; }
 .pin-btn.active { background:var(--accent); color:var(--bg); border-color:var(--accent); }
 
@@ -53,9 +54,12 @@ header .subtitle { font-size:.85rem; color:var(--text-muted); margin-top:4px; fo
 
 .weather-card { background:var(--grad); border:1px solid var(--border); border-radius:20px; padding:36px; max-width:700px; margin:0 auto; box-shadow:0 12px 40px var(--shadow); }
 .wc-header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+.wc-top { display:flex; align-items:flex-start; justify-content:space-between; gap:24px; }
+.wc-top-info { flex:1; min-width:0; }
 .wc-city { font-size:1.6rem; font-weight:700; color:var(--accent); }
 .wc-country { font-size:1rem; color:var(--text-muted); }
-.wc-icon { font-size:4rem; line-height:1; }
+.wc-icon { line-height:1; flex-shrink:0; }
+.wc-icon img { width:160px; height:160px; object-fit:contain; }
 .wc-temp { font-size:3.4rem; font-weight:800; color:var(--text); margin:12px 0 4px; }
 .wc-desc { font-size:1.15rem; color:var(--text-muted); margin-bottom:24px; }
 .wc-feels { font-size:.9rem; color:var(--text-muted); }
@@ -89,7 +93,8 @@ header .subtitle { font-size:.85rem; color:var(--text-muted); margin-top:4px; fo
 .pinned-card .pc-header { display:flex; align-items:center; justify-content:space-between; padding-right:36px; }
 .pinned-card .pc-city { font-size:1.25rem; font-weight:700; color:var(--accent); }
 .pinned-card .pc-loc { font-size:.85rem; color:var(--text-muted); margin-top:2px; }
-.pinned-card .pc-icon { font-size:2.4rem; }
+.pinned-card .pc-icon { }
+.pinned-card .pc-icon img { width:56px; height:56px; object-fit:contain; }
 .pinned-card .pc-temp { font-size:2rem; font-weight:800; margin:8px 0 2px; }
 .pinned-card .pc-desc { font-size:.95rem; color:var(--text-muted); margin-bottom:6px; }
 .pinned-card .pc-feels { font-size:.8rem; color:var(--text-muted); }
@@ -109,17 +114,17 @@ def docs_page():
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>☁️ API Clima · Consultar Clima</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☁️</text></svg>">
+        <title>API Clima · Consultar Clima</title>
+        <link rel="icon" href="/pngs/apiClimaLogo.png">
         <style>{_DOCS_CSS}</style>
       </head>
       <body>
         <header>
-          <h1>☁️ API Clima</h1>
+          <img src="/pngs/apiClimaLogo.png" alt="API Clima" class="logo-img">
           <div class="subtitle">by bobabi</div>
           <div class="header-btns">
             <button class="header-btn pin-btn" id="pinBtn" title="Fixar cidade" onclick="toggleFixar()">📌</button>
-            <button class="header-btn" id="themeBtn" title="Alternar tema">🌙</button>
+            <button class="header-btn" id="themeBtn" title="Alternar tema"><img src="/pngs/darkMode.png" alt="Tema"></button>
           </div>
         </header>
 
@@ -148,7 +153,6 @@ def docs_page():
           const themeBtn = document.getElementById('themeBtn');
           function applyTheme(t){{
             root.classList.toggle('light', t==='light');
-            themeBtn.textContent = t==='light' ? '☀️' : '🌙';
             localStorage.setItem('clima-theme', t);
           }}
           applyTheme(localStorage.getItem('clima-theme') || 'dark');
@@ -249,7 +253,7 @@ def docs_page():
                   cards[i] = '<div class="pinned-card" data-cidade="' + dd.cidade + '" data-estado="' + (dd.estado||'') + '" data-pais="' + dd.pais + '">'
                     + '<button class="pc-remove" title="Desfixar">✕</button>'
                     + '<div class="pc-header"><div><div class="pc-city">' + dd.cidade + '</div><div class="pc-loc">' + local + '</div></div>'
-                    + '<div class="pc-icon">' + dd.clima.icone + '</div></div>'
+                    + '<div class="pc-icon"><img src="/pngs/emotes/' + dd.clima.icone + '.png" alt="' + dd.clima.condicao + '"></div></div>'
                     + '<div class="pc-temp">' + t.atual_c + '°C</div>'
                     + '<div class="pc-desc">' + dd.clima.descricao + '</div>'
                     + '<div class="pc-feels">Min ' + t.minima_c + '° / Max ' + t.maxima_c + '° · 💧 ' + t.umidade_pct + '%</div>'
@@ -363,16 +367,16 @@ def docs_page():
             document.getElementById('weatherArea').innerHTML = `
             <div class="weather-result show">
               <div class="weather-card">
-                <div class="wc-header">
-                  <div>
+                <div class="wc-top">
+                  <div class="wc-top-info">
                     <div class="wc-city">${{d.cidade}}</div>
                     <div class="wc-country">${{local}} · ${{d.coordenadas.latitude}}, ${{d.coordenadas.longitude}}</div>
+                    <div class="wc-temp">${{t.atual_c}}°C</div>
+                    <div class="wc-desc">${{d.clima.descricao}}</div>
+                    <div class="wc-feels">Sensação térmica: ${{t.sensacao_termica_c}}°C · Min ${{t.minima_c}}°C / Max ${{t.maxima_c}}°C</div>
                   </div>
-                  <div class="wc-icon">${{d.clima.icone}}</div>
+                  <div class="wc-icon"><img src="/pngs/emotes/${{d.clima.icone}}.png" alt="${{d.clima.condicao}}"></div>
                 </div>
-                <div class="wc-temp">${{t.atual_c}}°C</div>
-                <div class="wc-desc">${{d.clima.descricao}}</div>
-                <div class="wc-feels">Sensação térmica: ${{t.sensacao_termica_c}}°C · Min ${{t.minima_c}}°C / Max ${{t.maxima_c}}°C</div>
                 <div class="wc-grid">
                   <div class="wc-item"><div class="emoji">💧</div><div class="label">Umidade</div><div class="value">${{t.umidade_pct}}%</div></div>
                   <div class="wc-item"><div class="emoji">🧭</div><div class="label">Pressão</div><div class="value">${{t.pressao_hpa}} hPa</div></div>

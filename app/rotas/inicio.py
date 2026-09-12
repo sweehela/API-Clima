@@ -14,10 +14,10 @@ router = APIRouter()
 def home():
     return """
     <html>
-      <head><meta charset="utf-8"><title>☁️ API Clima</title></head>
-      <body style="font-family:Segoe UI,Arial;max-width:700px;margin:40px auto;line-height:1.6;background:#0f172a;color:#e2e8f0">
-        <h1 style="color:#38bdf8">🌤️ API Clima</h1>
-        <p style="font-style:italic;color:#94a3b8;font-size:.85rem;margin-top:-4px">by bobabi</p>
+      <head><meta charset="utf-8"><title>API Clima</title></head>
+      <body style="font-family:Segoe UI,Arial;max-width:700px;margin:40px auto;line-height:1.6;background:#0f172a;color:#e2e8f0;text-align:center">
+        <img src="/pngs/apiClimaLogo.png" alt="API Clima" style="max-width:180px;width:100%;height:auto;margin:0 auto 6px;display:block">
+        <p style="font-style:italic;color:#94a3b8;font-size:.85rem;margin-top:0">by bobabi</p>
         <p>Bem-vindo(a)! Use o endpoint abaixo para consultar o clima de qualquer cidade.</p>
         <p>➡️ <code style="background:#1e293b;padding:4px 8px;border-radius:6px">GET /clima?cidade=NOME_DA_CIDADE</code></p>
         <p>📄 Documentação interativa: <a style="color:#38bdf8" href="/docs">/docs</a></p>
